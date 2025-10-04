@@ -67,8 +67,6 @@ def fetch_data_in_chunks(lat, lon, start_year, end_year, chunk_months=3):
                 print(f"  No data returned for this chunk.")
             time.sleep(2)
     return all_dfs
-
-# --- Main Execution ---
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(
         description="Fetch missing NOAA data for Gulf of Mannar."
@@ -82,8 +80,6 @@ if __name__ == "__main__":
     parser.add_argument('-s', '--start-year', type=int, default=1985)
     parser.add_argument('-e', '--end-year', type=int, default=datetime.now().year - 1)
     args = parser.parse_args()
-
-    # Corrected, offshore coordinates for Gulf of Mannar
     location_to_fetch = {
         "name": "Gulf_of_Mannar",
         "lat": 8.80,

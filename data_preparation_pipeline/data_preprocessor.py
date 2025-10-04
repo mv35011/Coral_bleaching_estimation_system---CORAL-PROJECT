@@ -16,9 +16,6 @@ def apply_heuristic_labels(df):
         (df['degree_heating_week_c_weeks'] >= 4) & (df['degree_heating_week_c_weeks'] < 8),
         (df['degree_heating_week_c_weeks'] >= 8)
     ]
-
-    # Define the bleaching percentage ranges for each condition
-    # Using random values within a range makes the data more realistic
     choices = [
         np.random.uniform(1, 5, size=len(df)),
         np.random.uniform(10, 30, size=len(df)),
@@ -38,11 +35,7 @@ def feature_engineer(df):
     Creates new time-based features from the 'time' column.
     """
     print("\nStarting feature engineering...")
-
-    # Ensure 'time' column is in datetime format
     df['time'] = pd.to_datetime(df['time'])
-
-    # Create time-based features
     df['year'] = df['time'].dt.year
     df['month'] = df['time'].dt.month
     df['day_of_year'] = df['time'].dt.dayofyear
@@ -66,7 +59,6 @@ def clean_data(df):
 
     if missing_values.sum() > 0:
         print("\nHandling missing values...")
-        # Forward fill is a good strategy for time-series data
         df.fillna(method='ffill', inplace=True)
         print("✅ Missing values handled using forward fill.")
     else:
@@ -107,13 +99,9 @@ if __name__ == "__main__":
     except FileNotFoundError:
         print(f"❌ ERROR: Input file not found at '{args.input_file}'")
         exit()
-
-    # Run the processing pipeline
     cleaned_df = clean_data(raw_df)
     engineered_df = feature_engineer(cleaned_df)
     final_df = apply_heuristic_labels(engineered_df)
-
-    # Save the final processed file
     try:
         final_df.to_csv(args.output, index=False)
         print(f"\n--- Processing Complete! ---")
