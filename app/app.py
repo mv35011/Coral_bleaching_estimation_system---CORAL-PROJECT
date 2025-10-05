@@ -9,17 +9,12 @@ import requests
 from io import StringIO
 from datetime import datetime, timedelta
 import time
-
-# --- Page Configuration ---
 st.set_page_config(
     page_title="Project CORAL",
     page_icon="🐠",
     layout="wide",
     initial_sidebar_state="expanded",
 )
-
-# --- Constants ---
-# Corrected paths for deployment from the root of the repo
 MODEL_FILE = 'app/coral_bleaching_model.pkl'
 HISTORICAL_DATA_FILE = 'app/coral_data_PROCESSED.csv'
 
@@ -29,10 +24,7 @@ REEF_LOCATIONS = {
     "Gulf_of_Mannar": {"lat": 8.80, "lon": 78.25},
     "Gulf_of_Kutch": {"lat": 22.47, "lon": 69.07},
 }
-
-
-# --- Caching Functions ---
-@st.cache_resource  # <<< THIS IS THE NEW LINE
+@st.cache_resource
 def load_model():
     """Load the trained machine learning model from file."""
     try:
@@ -43,7 +35,7 @@ def load_model():
         return None
 
 
-@st.cache_data  # <<< THIS IS THE NEW LINE
+@st.cache_data
 def load_historical_data():
     """Load the processed historical data from CSV."""
     try:
@@ -53,10 +45,7 @@ def load_historical_data():
         st.error(
             f"Error: Historical data file not found at '{HISTORICAL_DATA_FILE}'. Please run the preprocessor script.")
         return None
-
-
-# --- Live Data Fetching & Processing ---
-@st.cache_data(ttl=3600)  # This was already correctly cached
+@st.cache_data(ttl=3600)
 def get_live_data(lat, lon):
     """
     Fetches the last 30 days of data, trying multiple servers for reliability.
@@ -108,9 +97,6 @@ def preprocess_live_data(df):
     df['day_of_year'] = df['time'].dt.dayofyear
     df['week_of_year'] = df['time'].dt.isocalendar().week.astype(int)
     return df
-
-
-# --- UI Helper Functions ---
 def create_risk_gauge(risk_value):
     """Creates a Plotly gauge chart for the risk score."""
     fig = go.Figure(go.Indicator(
@@ -128,18 +114,12 @@ def create_risk_gauge(risk_value):
         }))
     fig.update_layout(height=300, margin=dict(l=20, r=20, t=50, b=20))
     return fig
-
-
-# --- Main Application ---
 def main():
-    # --- Load Resources ---
     model = load_model()
     historical_df = load_historical_data()
 
     if model is None or historical_df is None:
         st.stop()
-
-    # --- Header ---
     st.title("🐠 Project CORAL: The Coral Oracle")
     st.markdown("""
         Welcome to Project CORAL, an AI-powered early warning system designed to protect India's precious marine ecosystems. 
@@ -147,8 +127,6 @@ def main():
         we aim to provide valuable insights to researchers, conservationists, and the community to aid in the monitoring and preservation of our vital coral reefs.
     """)
     st.divider()
-
-    # --- Sidebar & Map ---
     with st.sidebar:
         st.header("Select a Reef Location")
         m = folium.Map(location=[20.5937, 78.9629], zoom_start=5)
@@ -168,8 +146,6 @@ def main():
 
         st.info("Click a marker on the map to load the risk dashboard for that location.")
         st.markdown(f"**Data Last Updated:** {datetime.utcnow().strftime('%Y-%m-%d %H:%M')} UTC")
-
-    # --- Main Dashboard Area ---
     if 'selected_location' not in st.session_state:
         st.info("Please select a reef from the map in the sidebar to begin.")
     else:
@@ -177,8 +153,6 @@ def main():
         coords = REEF_LOCATIONS[location_name]
 
         st.header(f"Dashboard for: {location_name.replace('_', ' ')}")
-
-        # --- Robust Data Fetching with Fallback ---
         with st.spinner("Fetching and analyzing data..."):
             live_df_raw = get_live_data(coords['lat'], coords['lon'])
 
@@ -189,12 +163,8 @@ def main():
                 st.warning(
                     f"⚠️ Could not connect to live data servers. Displaying the most recent historical data from **{fallback_date}**.",
                     icon="🛰️")
-
-        # --- Create Tabs ---
         tab1, tab2, tab3 = st.tabs(
             ["🌊 Live Risk Assessment", "🔬 'What-If' Scenario Simulator", "📈 Historical Data Explorer"])
-
-        # --- Tab 1: Live Risk Assessment ---
         with tab1:
             if live_df_raw is not None and not live_df_raw.empty:
                 live_df_processed = preprocess_live_data(live_df_raw.copy())
@@ -215,8 +185,6 @@ def main():
                     st.plotly_chart(create_risk_gauge(prediction), use_container_width=True)
             else:
                 st.error("Could not retrieve any data to perform risk assessment.")
-
-        # --- Tab 2: Scenario Simulator ---
         with tab2:
             st.subheader("Simulate Environmental Changes")
             st.markdown(
@@ -255,8 +223,6 @@ def main():
                     "This simulation provides an estimate based on the model's learned patterns. Real-world outcomes can be influenced by other complex factors.")
             else:
                 st.error("Data is required for the simulator. Please try again later.")
-
-        # --- Tab 3: Historical Data Explorer ---
         with tab3:
             st.subheader("Explore Historical Trends")
             location_historical_df = historical_df[historical_df['location_name'] == location_name].copy()
