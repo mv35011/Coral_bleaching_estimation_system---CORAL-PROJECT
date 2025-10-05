@@ -21,8 +21,8 @@ REEF_LOCATIONS = {
     "Gulf_of_Mannar": {"lat": 8.80, "lon": 78.25},
     "Gulf_of_Kutch": {"lat": 22.47, "lon": 69.07},
 }
-MODEL_FILE = 'coral_bleaching_model.pkl'
-HISTORICAL_DATA_FILE = 'coral_data_PROCESSED.csv'
+MODEL_FILE = 'app/coral_bleaching_model.pkl'
+HISTORICAL_DATA_FILE = 'app/coral_data_PROCESSED.csv'
 @st.cache_resource
 def load_model():
     """Load the trained machine learning model from file."""
