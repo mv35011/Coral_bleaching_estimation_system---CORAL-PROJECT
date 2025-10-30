@@ -1,209 +1,145 @@
-# 🪸 Project CORAL: The Coral Oracle
+🐠 Project CORAL: The Coral Oracle
 
-> An AI-Powered Early Warning System for Coral Bleaching Events
+A live, AI-powered dashboard and chatbot designed to predict and explain coral bleaching risk in key Indian reef locations.
 
-[![Python](https://img.shields.io/badge/Python-3.9+-blue.svg)](https://www.python.org/downloads/)
-[![Streamlit](https://img.shields.io/badge/Streamlit-1.0+-red.svg)](https://streamlit.io/)
-[![License](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
 
----
+1. Overview
 
-## 📋 Table of Contents
+Project CORAL is an end-to-end data science application that serves as an early warning system for coral bleaching. It combines a classical machine learning model (trained on 30+ years of satellite data) with a generative AI chatbot (powered by Groq) to provide a comprehensive, interactive, and user-friendly dashboard.
 
-- [Project Vision](#-project-vision)
-- [The Problem: A Silent Crisis](#-the-problem-a-silent-crisis)
-- [Our Solution: A Predictive Framework](#-our-solution-a-predictive-framework)
-- [System Architecture & Data Flow](#-system-architecture--data-flow)
-- [The Data Plan: A Two-Phase Strategy](#-the-data-plan-a-two-phase-strategy)
-  - [Phase 1: The Heuristic-Based Prototype](#phase-1-the-heuristic-based-prototype)
-  - [Phase 2: The Ground-Truth Model](#phase-2-the-ground-truth-model)
-- [Technology Stack](#-technology-stack)
-- [Project Roadmap & Milestones](#-project-roadmap--milestones)
-- [How to Run This Project](#-how-to-run-this-project)
-- [Contributors](#-contributors)
+The application allows users to:
 
----
+Get live (or near-live) predictions for coral bleaching risk.
 
-## 🌊 Project Vision
+Simulate how changes in ocean temperature would affect this risk.
 
-**Project CORAL** aims to develop an intelligent, data-driven tool to forecast coral bleaching events for critical reef ecosystems around India. By synthesizing satellite data with machine learning, this project will provide a functional early warning system, demonstrating a powerful application of Green Tech to a pressing environmental challenge.
+Explore historical data to identify past bleaching events.
 
----
+Have a natural language conversation with "Finley," an AI-powered fish, to understand the data.
 
-## 🚨 The Problem: A Silent Crisis
+2. Key Features
 
-Coral reefs are vital marine ecosystems, but they are under severe threat from climate change. Rising sea temperatures cause **coral bleaching**, a stress response that can lead to mass coral mortality. Predicting these events is crucial for conservation efforts, but requires the analysis of complex, multi-variate environmental data.
+AI-Powered Risk Prediction: A GradientBoosting model trained on NOAA satellite data predicts the bleaching risk percentage with over 90% R² accuracy (on its heuristic-based training data).
 
----
+"What-If" Scenario Simulator: Interactive sliders allow users to change the Sea Surface Temperature and Degree Heating Weeks to see how these factors would alter the model's risk prediction in real-time.
 
-## 💡 Our Solution: A Predictive Framework
+Historical Data Explorer: An interactive Plotly chart displays over 30 years of historical data, including temperature, heat stress, and the model's predicted risk over time, visually highlighting past bleaching events.
 
-We are building an **interactive web application** that allows a user to select a coral reef location and receive an AI-generated risk assessment for bleaching. The system will process a suite of oceanographic variables to generate a clear, actionable prediction.
+"Ask Finley" AI Chatbot: A conversational AI assistant powered by Groq (using Llama 3). Finley has a distinct persona and uses Retrieval-Augmented Generation (RAG) to answer questions about the live and historical data for the selected reef.
 
-**The final output will be a predicted coral bleaching percentage, presented with a color-coded risk level (Low, Medium, High).**
+3. Tech Stack
 
----
+This project was intentionally built to be robust and lightweight, avoiding unnecessary, complex dependencies.
 
-## 🏗️ System Architecture & Data Flow
+Component
 
-Our architecture is designed for modularity and rapid development, ensuring a functional end-to-end pipeline.
+Technology
 
-### Data Flow Steps:
+Why?
 
-1. **Frontend Interaction**: A user interacts with a Folium map embedded in a Streamlit web application to select a reef location (e.g., Andaman Islands).
+Data Science & ML
 
-2. **Backend Data Acquisition**: The system queries public APIs from NOAA and Copernicus Marine Service for the latest environmental data corresponding to the selected coordinates (SST, DHW, pH, Salinity).
+Pandas, Scikit-learn, Joblib
 
-3. **Data Preprocessing**: The fetched data is cleaned, normalized using a pre-fitted StandardScaler, and structured into a feature vector.
+For robust data processing and training a reliable GradientBoosting model.
 
-4. **AI Model Inference**: This feature vector is fed into our trained Scikit-learn `GradientBoostingRegressor` model.
+Application & UI
 
-5. **Frontend Visualization**: The model's prediction (e.g., "45% Bleaching Risk") is sent back to the Streamlit UI and displayed to the user with supporting charts and risk indicators.
+Streamlit, Streamlit-Folium, Plotly
 
----
+To build a beautiful, interactive web app using only Python.
 
-## 📊 The Data Plan: A Two-Phase Strategy
+AI Chatbot
 
-Acquiring high-quality "ground-truth" data is the primary challenge in environmental AI. To mitigate this risk and ensure project success, we are adopting a **two-phase approach**.
+Groq API (Llama 3), requests
 
-### Phase 1: The Heuristic-Based Prototype
+(No LangChain). We call the Groq API directly for maximum speed and to avoid complex dependency issues.
 
-**Proof of Concept**
+Environment
 
-This phase focuses on building a fully functional prototype to validate our architecture and modeling approach, even without real-world bleaching observations.
+python-dotenv, .gitignore
 
-**Problem**: Machine learning models cannot be trained without a target variable (y). The principle of "Garbage In, Garbage Out" means using purely random dummy data would yield a meaningless model.
+For securely managing API keys locally.
 
-**Our Solution**: We will generate a scientifically-defensible proxy target variable using a heuristic based on NOAA's official Degree Heating Week (DHW) alert levels.
+4. How to Run Locally (Step-by-Step)
 
-| DHW Value (Heat Stress) | NOAA Alert Level | Heuristic Observed_Bleaching_% (Our Proxy Label) |
-|-------------------------|------------------|--------------------------------------------------|
-| DHW = 0 | No Stress | Random value between 1-5% |
-| 0 < DHW < 4 | Bleaching Watch/Warning | Random value between 10-30% |
-| 4 ≤ DHW < 8 | Alert Level 1 (Bleaching Likely) | Random value between 30-60% |
-| DHW ≥ 8 | Alert Level 2 (Mortality Likely) | Random value between 60-90% |
+Follow these steps exactly to get the application running on your local machine.
 
-This approach allows our model to learn the complex, non-linear relationships between various environmental inputs and a logically sound, risk-stratified output. This prototype will be fully functional and serve as the basis for our engagement with academic experts.
+Step 1: Clone the Repository
 
-### Phase 2: The Ground-Truth Model
+git clone https://github.com/mv35011/Coral_bleaching_estimation_system---CORAL-PROJECT.git
+cd Coral_bleaching_estimation_system---CORAL-PROJECT
 
-**The Ultimate Goal**
 
-With the functional prototype in hand, our primary goal is to replace the heuristic labels with real-world field survey data.
+Step 2: Create a Python Virtual Environment
 
-**Action Plan**:
+It's critical to use a virtual environment to avoid package conflicts.
 
-- Conduct a time-boxed, intensive literature review of academic papers on Indian coral reefs.
-- Identify and contact marine biologists and oceanographic institutions (NIO, ZSI) to request historical bleaching survey data for academic purposes.
-- If successful, retrain our `GradientBoostingRegressor` model on this ground-truth data to achieve a higher level of predictive accuracy.
+# Create the virtual environment
+python -m venv .venv
 
----
+# Activate it:
+# On Windows (Powershell)
+.\.venv\Scripts\Activate
+# On Mac/Linux
+source .venv/bin/activate
 
-## 🛠️ Technology Stack
 
-| Category | Tool / Library | Purpose |
-|----------|---------------|---------|
-| **Backend / AI** | Python 3.9+ | Core Language |
-| | Scikit-learn | Model Training (GradientBoostingRegressor) |
-| | Pandas / NumPy | Data Manipulation & Analysis |
-| | Xarray / NetCDF4 | Parsing Scientific Data Formats |
-| **Frontend / UI** | Streamlit | Interactive Web Application Framework |
-| | Folium | Interactive Mapping |
-| | Plotly | Data Visualization & Charting |
-| **Data Sources** | NOAA / Copernicus | APIs for Environmental Data |
-| **Deployment** | GitHub / Streamlit Community Cloud | Version Control & Public Hosting |
+Step 3: Create Your .env File
 
----
+This file stores your secret API key. It is hidden from GitHub by the .gitignore file.
 
-## 🗓️ Project Roadmap & Milestones
+In the root of the project, create a file named .env
 
-### Sprint 1: Foundation & Data Pipeline (Weeks 1-2)
+Open it and add your Groq API key:
 
-- [ ] Initialize GitHub repository with this README.
-- [ ] Set up the Python environment (`requirements.txt`).
-- [ ] Develop scripts to fetch and process data from NOAA & Copernicus.
-- [ ] Implement the heuristic labeling system (Phase 1).
-- [ ] **Deliverable**: A complete, ML-ready dataset with heuristic labels.
+GROQ_API_KEY="your-actual-api-key-from-groq-goes-here"
 
-### Sprint 2: Model Development & Baseline UI (Weeks 3-4)
 
-- [ ] Train the first version of the `GradientBoostingRegressor` model.
-- [ ] Save the trained model (`.pkl`) and the `StandardScaler`.
-- [ ] Build a basic Streamlit app that takes numerical inputs and shows a prediction.
-- [ ] **Deliverable**: A baseline predictive model and a simple UI.
+Step 4: Create Finley's Context File
 
-### Sprint 3: Interactive UI & Integration (Weeks 5-6)
+The app needs this file to load Finley's persona.
 
-- [ ] Integrate the Folium map into the Streamlit app.
-- [ ] Enable user interaction (clicking map to trigger prediction).
-- [ ] Design and implement clear data visualizations for the results.
-- [ ] **Deliverable**: A fully integrated, interactive prototype.
+Go into the app/ folder.
 
-### Sprint 4: Refinement, Deployment & Documentation (Weeks 7-8)
+Create a file named coral_context.txt
 
-- [ ] Refine the model (hyperparameter tuning).
-- [ ] Improve UI/UX and add explanatory text.
-- [ ] Deploy the application to Streamlit Community Cloud.
-- [ ] Prepare the final project report and presentation.
-- [ ] **Deliverable**: A publicly deployed application and final documentation.
+Paste the persona text from the file I provided in the previous step (or ask me for it again).
 
----
+Step 5: Install All Requirements
 
-## 🚀 How to Run This Project
+Use the requirements.txt file to install the exact, compatible versions of all libraries.
 
-### Prerequisites
+# Make sure your .venv is active!
+pip install -r requirements.txt
 
-- Python 3.9 or higher
-- pip package manager
 
-### Installation
+Step 6: Re-Train The Model (CRITICAL)
 
-1. **Clone the repository**:
-   ```bash
-   git clone https://github.com/[your-username]/Project-CORAL.git
-   cd Project-CORAL
-   ```
+This is the most important step. The included .pkl file was trained in a different environment and will fail due to a numpy version mismatch. You must re-train it in your new environment.
 
-2. **Install dependencies**:
-   ```bash
-   pip install -r requirements.txt
-   ```
+Make sure you have retrain_model.py in your project root.
 
-3. **Run the Streamlit app**:
-   ```bash
-   streamlit run app.py
-   ```
+Run the script:
 
-4. **Access the application**:
-   - Open your browser and navigate to `http://localhost:8501`
+# This will load data from app/ and save the new, compatible model to app/
+python retrain_model.py
 
----
 
-## 👥 Contributors
+Step 7: Run the Streamlit App!
 
-- **[Your Name]** - [GitHub Profile](https://github.com/your-username)
-- **[Teammate's Name]** - [GitHub Profile](https://github.com/teammate-username)
+You are now ready to launch.
 
----
+# Run this from the ROOT of your project
+streamlit run app/app.py
 
-## 📄 License
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+Your browser should open automatically to http://localhost:8501, and the complete application will be running.
 
----
+5. Deployment
 
-## 🙏 Acknowledgments
+This app is deployed on Streamlit Community Cloud.
 
-- NOAA Coral Reef Watch for providing critical environmental data
-- Copernicus Marine Service for oceanographic datasets
-- The marine biology community for their invaluable research on coral reef ecosystems
+API Key: The GROQ_API_KEY is not in the .env file. It is stored securely in Streamlit's Secrets management.
 
----
-
-<div align="center">
-
-**Built with 💙 for the oceans**
-
-⭐ Star this repo if you believe in protecting our coral reefs!
-
-</div>
+File Paths: The app is configured to run from the root of the repository, with the "Main file path" in Streamlit's settings pointed to app/app.py.
