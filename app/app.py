@@ -11,10 +11,9 @@ from datetime import datetime, timedelta
 import os
 from dotenv import load_dotenv
 
-# --- No more langchain! ---
+
 from streamlit.runtime.caching import cache_resource
 
-# --- Page Configuration ---
 st.set_page_config(
     page_title="Project CORAL",
     page_icon="🐠",
@@ -22,7 +21,7 @@ st.set_page_config(
     initial_sidebar_state="expanded",
 )
 
-# --- POLISH: Use os.path.join for robust file paths ---
+
 APP_DIR = os.path.dirname(__file__)
 MODEL_FILE = os.path.join(APP_DIR, 'app/coral_bleaching_model.pkl')
 HISTORICAL_DATA_FILE = os.path.join(APP_DIR, 'app/coral_data_PROCESSED.csv')
@@ -36,7 +35,7 @@ REEF_LOCATIONS = {
     "Gulf_of_Kutch": {"lat": 22.47, "lon": 69.07},
 }
 
-# --- Caching Functions ---
+
 @st.cache_resource
 def load_model():
     """Load the trained machine learning model from file."""
@@ -67,7 +66,6 @@ def load_finley_context():
         st.error(f"Error: Finley's context file not found at '{FINLEY_CONTEXT_FILE}'.")
         return None
 
-# --- NEW: Direct Groq API Call Function ---
 def get_finley_response_groq(system_prompt, chat_history, rag_context):
     api_key = os.environ.get("GROQ_API_KEY")
     if not api_key:
@@ -106,7 +104,7 @@ def get_finley_response_groq(system_prompt, chat_history, rag_context):
         print(f"Error calling Groq API: {e}")
         return "I’m struggling to connect to Groq right now."
 
-# --- Live Data Fetching (Unchanged) ---
+
 @st.cache_data(ttl=3600)
 def get_live_data(lat, lon):
     """Fetches the last 30 days of data."""
@@ -162,7 +160,7 @@ def create_risk_gauge(risk_value):
         title={'text': "Current Risk Status"},
         gauge={
             'axis': {'range': [None, 100]},
-            'bar': {'color': "rgba(0,0,0,0)"}, # Invisible bar
+            'bar': {'color': "rgba(0,0,0,0)"}, 
             'steps': [
                 {'range': [0, 30], 'color': '#28a745'}, # Green
                 {'range': [30, 60], 'color': '#ffc107'}, # Yellow
@@ -172,7 +170,7 @@ def create_risk_gauge(risk_value):
     fig.update_layout(height=300, margin=dict(l=20, r=20, t=50, b=20))
     return fig
 
-# --- POLISH: New function to get human-readable status ---
+
 def get_risk_status(prediction):
     """Returns a status string and color based on the risk percentage."""
     if prediction < 30:
@@ -182,7 +180,6 @@ def get_risk_status(prediction):
     else:
         return "CRITICAL", "#dc3545" # Red
 
-# --- Main Application ---
 def main():
     load_dotenv()
 
@@ -219,9 +216,9 @@ def main():
         if map_data and map_data.get("last_object_clicked_popup"):
             clicked_name = map_data["last_object_clicked_popup"].replace(" ", "_")
             if clicked_name in REEF_LOCATIONS:
-                # When location changes, clear the chat history for that location
+                
                 if st.session_state.get("selected_location") != clicked_name:
-                    # Check if the key exists before trying to clear it
+                    
                     if f"chat_history_{clicked_name}" in st.session_state:
                         st.session_state[f"chat_history_{clicked_name}"] = []
                 st.session_state.selected_location = clicked_name
@@ -229,7 +226,7 @@ def main():
         st.info("Click a marker to load the reef dashboard.")
         st.markdown(f"**Data Last Updated:** {datetime.utcnow().strftime('%Y-%m-%d %H:%M')} UTC")
 
-        # --- POLISH: Added an "About" expander ---
+        
         with st.expander("About this Project"):
             st.markdown("""
                 This app uses a `scikit-learn` model trained on NOAA satellite data to predict coral bleaching risk. 
@@ -285,7 +282,7 @@ def main():
         with tab1:
             col1, col2 = st.columns([1, 2])
             with col1:
-                # --- POLISH: Added human-readable status ---
+                
                 status_text, status_color = get_risk_status(prediction)
                 st.markdown(f"### Status: <span style='color:{status_color};'>{status_text}</span>", unsafe_allow_html=True)
                 st.metric("Predicted Bleaching Risk", f"{prediction:.2f}%")
@@ -333,7 +330,6 @@ def main():
         with tab4:
             st.subheader(f"Ask Finley about {location_name.replace('_', ' ')}")
             
-            # --- POLISH: Added Finley's intro and example prompts ---
             st.markdown("""
             Hi! I'm **Finley** 🐠, the local parrotfish for this reef. I know a lot about what's happening here. 
             Ask me a question, or try one of these:
@@ -343,25 +339,25 @@ def main():
             * "What was the worst event that ever happened here?"
             * "What does 'Degree Heating Week' mean?"
             """)
-            st.divider() # ---
+            st.divider()
             
-            # --- Simplified Chat History Management ---
+            
             history_key = f"chat_history_{location_name}"
             if history_key not in st.session_state:
                 st.session_state[history_key] = []
 
-            # Display chat messages
+           
             for message in st.session_state[history_key]:
                 avatar = "🐠" if message["role"] == "assistant" else "user"
                 with st.chat_message(message["role"], avatar=avatar):
                     st.markdown(message["content"])
 
             if prompt := st.chat_input("Ask Finley about this reef..."):
-                # Display user message
+                
                 with st.chat_message("user"):
                     st.markdown(prompt)
 
-                # Create the RAG context string
+                
                 rag_context = f"""
 Here is the current data for {location_name}:
 - Data Status: {"Live" if is_live_data else f"Historical ({fallback_date})"}
@@ -373,22 +369,21 @@ Here is the current data for {location_name}:
 My question is: {prompt}
 """
                 with st.spinner("Finley is thinking..."):
-                    # 🚩 --- CORRECTED LOGIC --- 🚩
-                    # 1. Call the API BEFORE updating history
+                    
                     response_text = get_finley_response_groq(
                         finley_context,
-                        st.session_state[history_key], # Pass the history AS IT IS
-                        rag_context # Pass the new RAG-infused prompt
+                        st.session_state[history_key], 
+                        rag_context 
                     )
                     
-                    # 2. Add the user's original prompt to history
+                    
                     st.session_state[history_key].append({"role": "user", "content": prompt})
 
-                    # 3. Display assistant response
+                    
                     with st.chat_message("assistant", avatar="🐠"):
                         st.markdown(response_text)
                         
-                    # 4. Add assistant response to history
+                    
                     st.session_state[history_key].append({"role": "assistant", "content": response_text})
 
 if __name__ == "__main__":

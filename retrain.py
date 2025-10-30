@@ -5,8 +5,7 @@ from sklearn.metrics import mean_absolute_error, r2_score
 import joblib
 import os
 
-# --- Configuration ---
-# Correct paths based on your project structure
+
 PROCESSED_DATA_PATH = 'app/coral_data_PROCESSED.csv'
 NEW_MODEL_PATH = 'app/coral_bleaching_model.pkl'
 
