@@ -23,9 +23,9 @@ st.set_page_config(
 
 
 APP_DIR = os.path.dirname(__file__)
-MODEL_FILE = os.path.join(APP_DIR, 'app/coral_bleaching_model.pkl')
-HISTORICAL_DATA_FILE = os.path.join(APP_DIR, 'app/coral_data_PROCESSED.csv')
-FINLEY_CONTEXT_FILE = os.path.join(APP_DIR, 'app/coral_context.txt')
+MODEL_FILE = os.path.join(APP_DIR, 'coral_bleaching_model.pkl')
+HISTORICAL_DATA_FILE = os.path.join(APP_DIR, 'coral_data_PROCESSED.csv')
+FINLEY_CONTEXT_FILE = os.path.join(APP_DIR, 'coral_context.txt')
 
 
 REEF_LOCATIONS = {
