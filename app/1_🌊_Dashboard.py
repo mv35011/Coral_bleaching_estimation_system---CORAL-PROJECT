@@ -174,11 +174,11 @@ def create_risk_gauge(risk_value):
 def get_risk_status(prediction):
     """Returns a status string and color based on the risk percentage."""
     if prediction < 30:
-        return "LOW RISK", "#28a745" # Green
+        return "LOW RISK", "#28a745" 
     elif prediction < 60:
-        return "WARNING", "#ffc107" # Yellow
+        return "WARNING", "#ffc107" 
     else:
-        return "CRITICAL", "#dc3545" # Red
+        return "CRITICAL", "#dc3545" 
 
 def main():
     load_dotenv()

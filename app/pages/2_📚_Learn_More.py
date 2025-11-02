@@ -1,7 +1,7 @@
 import streamlit as st
 from pathlib import Path
 
-# ✅ Get absolute path to the "images" folder (works reliably even inside /pages)
+
 img_dir = Path(__file__).resolve().parents[1] / "images"
 
 st.set_page_config(
